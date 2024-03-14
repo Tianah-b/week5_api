@@ -11,40 +11,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getWeatherData = void 0;
 const express_validator_1 = require("express-validator");
-const weatherService_ts_1 = require("../Services/weatherService.ts"); // Removed .js extension
-/**
- * Gets the weather data for a city
- * @param req the request object
- * @param res the response object
- */
+const WeatherService_1 = require("../Services/WeatherService"); // Capitalization to match your folder structure
 const getWeatherData = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // Check if there are any validation errors
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        console.error("Validation error", errors.mapped());
-        res.status(400).json({ errors: errors.array() });
-        return;
+        return res.status(400).json({ errors: errors.array() });
     }
     try {
         const { city } = req.params;
-        console.log(city);
         let finalWeatherData;
-        if (city === "london") {
-            console.log((0, weatherService_ts_1.generateLondonWeatherData)());
-            finalWeatherData = (0, weatherService_ts_1.generateLondonWeatherData)();
+        switch (city.toLowerCase()) {
+            case "london":
+                finalWeatherData = (0, WeatherService_1.generateLondonWeatherData)();
+                break;
+            case "dublin":
+                finalWeatherData = (0, WeatherService_1.generateDublinWeatherData)();
+                break;
+            default:
+                return res.status(404).send("City not found");
         }
-        else if (city === "dublin") {
-            finalWeatherData = (0, weatherService_ts_1.generateDublinWeatherData)();
-        }
-        else {
-            res.status(404).send("City not found");
-            return;
-        }
-        res.status(200).json(finalWeatherData);
+        res.json(finalWeatherData);
     }
     catch (error) {
-        console.error("Error in fetching weather data", error);
-        res.status(500).send("Error in fetching weather data");
+        console.error(error);
+        res.status(500).send("Server error");
     }
 });
 exports.getWeatherData = getWeatherData;

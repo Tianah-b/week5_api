@@ -1,11 +1,15 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const weatherController_1 = require("../controllers/weatherController"); // Removed .js extension
-const validators_1 = require("../middleware/validators"); // Removed .js extension
-const router = express_1.default.Router();
-router.get("/:city", validators_1.validateCityName, weatherController_1.getWeatherData);
-exports.default = router;
+exports.validateCityName = void 0;
+const express_validator_1 = require("express-validator");
+exports.validateCityName = [
+    (0, express_validator_1.param)('city').isString().withMessage('City name must be a string.'),
+    (0, express_validator_1.param)('city').isIn(['london', 'dublin']).withMessage('City name must be either London or Dublin.'),
+    (req, res, next) => {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+];

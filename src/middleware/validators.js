@@ -1,6 +1,13 @@
-import { param } from "express-validator";
+const { param, validationResult } = require('express-validator');
 
-export const validateCityName = param("city")
-  .isString()
-  .isIn(["london", "dublin"])
-  .withMessage("City name must be either london or dublin");
+exports.validateCityName = [
+    param('city').isString().withMessage('City name must be a string.'),
+    param('city').isIn(['london', 'dublin']).withMessage('City name must be either London or Dublin.'),
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+];

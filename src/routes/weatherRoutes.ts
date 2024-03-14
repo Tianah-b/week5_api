@@ -1,9 +1,14 @@
-import express from "express";
-import { getWeatherData } from "../controllers/weatherController"; // Removed .js extension
-import { validateCityName } from "../middleware/validators"; // Removed .js extension
+import { param, validationResult } from 'express-validator';
+import { Request, Response, NextFunction } from 'express';
 
-const router = express.Router();
-
-router.get("/:city", validateCityName, getWeatherData);
-
-export default router;
+export const validateCityName = [
+    param('city').isString().withMessage('City name must be a string.'),
+    param('city').isIn(['london', 'dublin']).withMessage('City name must be either London or Dublin.'),
+    (req: Request, res: Response, next: NextFunction) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        next();
+    }
+];
