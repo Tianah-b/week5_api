@@ -4,7 +4,7 @@
   "description": "The new description weather API",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:watch": "tsc --watch"
   },
   "keywords": [],
   "author": "Lucian Duta",
